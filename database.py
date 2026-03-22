@@ -1,4 +1,4 @@
-# Usuarios ficticios
+# Usuario ficticio
 users_db = {
     "rafael": {
         "username": "rafael",

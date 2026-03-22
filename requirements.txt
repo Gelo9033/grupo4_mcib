@@ -1,0 +1,154 @@
+## API Banco Simulado Inteligente (Python + FastAPI)
+Funcionalidades
+🔐 Login con JWT
+💰 Consulta de saldo
+💸 Transferencias (simuladas)
+📊 Historial de movimientos
+🧠 Detección básica de fraude
+📌 Datos completamente ficticios (seguro y didáctico)
+1. Instalación
+python -m pip install fastapi uvicorn python-jose passlib[bcrypt]
+2. Estructura
+bank_api/
+- main.py
+- auth.py
+- database.py
+- models.py
+- utils.py
+3. Base de datos simulada (database.py)
+# Usuarios ficticios
+users_db = {
+    "rafael": {
+        "username": "rafael",
+        "password": "1234",  # luego se puede encriptar
+        "saldo": 1500.0,
+        "movimientos": []
+    }
+}
+4. Autenticación JWT - Jason Web Token (auth.py)
+from datetime import datetime, timedelta
+from jose import jwt
+
+SECRET_KEY = "clave_secreta"
+ALGORITHM = "HS256"
+
+def crear_token(data: dict):
+    datos = data.copy()
+    datos["exp"] = datetime.utcnow() + timedelta(hours=1)
+    return jwt.encode(datos, SECRET_KEY, algorithm=ALGORITHM)
+
+def verificar_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except:
+        return None
+
+5. Lógica inteligente (utils.py)
+def detectar_fraude(monto):
+    if monto > 1000:
+        return True
+    return False
+
+6. Modelos (models.py)
+from pydantic import BaseModel
+
+class Login(BaseModel):
+    username: str
+    password: str
+
+class Transferencia(BaseModel):
+    destino: str
+    monto: float
+
+7. Rutas principales (main.py)
+from fastapi import FastAPI, HTTPException, Depends
+from models import Login, Transferencia
+from database import users_db
+from auth import crear_token, verificar_token
+from utils import detectar_fraude
+
+app = FastAPI(title="Banco Simulado Inteligente")
+
+# -------- LOGIN --------
+@app.post("/login")
+def login(data: Login):
+    user = users_db.get(data.username)
+
+    if not user or user["password"] != data.password:
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+
+    token = crear_token({"sub": data.username})
+    return {"access_token": token}
+
+# -------- DEPENDENCIA --------
+def get_user(token: str):
+    payload = verificar_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    username = payload["sub"]
+    return users_db.get(username)
+
+# -------- SALDO --------
+@app.get("/saldo")
+def saldo(token: str):
+    user = get_user(token)
+    return {"saldo": user["saldo"]}
+
+# -------- TRANSFERENCIA --------
+@app.post("/transferir")
+def transferir(data: Transferencia, token: str):
+    user = get_user(token)
+
+    if user["saldo"] < data.monto:
+        raise HTTPException(status_code=400, detail="Saldo insuficiente")
+
+    fraude = detectar_fraude(data.monto)
+
+    user["saldo"] -= data.monto
+    user["movimientos"].append({
+        "tipo": "transferencia",
+        "monto": data.monto,
+        "destino": data.destino,
+        "fraude": fraude
+    })
+
+    return {
+        "mensaje": "Transferencia realizada",
+        "fraude_detectado": fraude
+    }
+
+# -------- MOVIMIENTOS --------
+@app.get("/movimientos")
+def movimientos(token: str):
+    user = get_user(token)
+    return {"movimientos": user["movimientos"]}
+
+8. Ejecución
+python -m uvicorn main:app --reload
+
+Abrir Navegador y acceder a:
+http://127.0.0.1:8000/docs
+
+Prueba Rápida:
+
+--Login:
+POST /login
+{
+  "username": "rafael",
+  "password": "1234"
+}
+
+-Consultar saldo:
+GET /saldo?token=TU_TOKEN
+
+--Transferir
+POST /transferir?token=TU_TOKEN
+{
+  "destino": "cuenta123",
+  "monto": 1200
+}
+
+
+
