@@ -7,3 +7,13 @@ class Login(BaseModel):
 class Transferencia(BaseModel):
     destino: str
     monto: float
+
+
+class UsuarioNuevo(BaseModel):
+    username: str
+    password: str
+    saldo_inicial: float = 0.0
+
+
+class RecargaSaldo(BaseModel):
+    monto: float
