@@ -43,7 +43,7 @@ El sistema está compuesto por los siguientes elementos:
 - **Repositorio GitHub**: Almacena el código fuente y el historial de versiones.
 - **Infraestructura Cloud**: Servicio de despliegue local/cloud (Cloud Run / Compute Engine, opcional).
 
-![RAMAS](.\img\ramas.jpeg "RAMAS")
+![RAMAS](img/ramas.jpeg "RAMAS")
 
 **Flujo general:**
 > Cliente → API (HTTP/JSON) → Lógica de negocio → PostgreSQL
@@ -66,7 +66,7 @@ El repositorio incluye:
 - `docker-compose.yml`
 - `requirements.txt`
 
-![Estructura del repositorio](.\img\api_structure.jpeg "Estructura del repositorio")
+![Estructura del repositorio](img/api_structure.jpeg "Estructura del repositorio")
 
 ### 5.3 Funcionalidades implementadas
 - **Endpoint GET (Inicio/Status)**
@@ -108,7 +108,7 @@ Se implementaron validaciones básicas como:
 **Manejo de respuestas**
 Todas las respuestas se devuelven en formato JSON estructurado.
 
-![API en Ejecución](.\img\api_funciona.jpeg "API en Ejecución")
+![API en Ejecución](img/api_funciona.jpeg "API en Ejecución")
 
 ---
 
@@ -127,7 +127,7 @@ Posteriormente:
 - Se realiza merge hacia `main`
 - Se valida la integración sin conflictos
 
-![API Branches](.\img\branches.jpeg "API Branches")
+![API Branches](img/branches.jpeg "API Branches")
 
 ---
 
@@ -141,7 +141,7 @@ Se creó un archivo Dockerfile que permite:
 - Exponer el puerto **interno** 8001 del contenedor
 - Ejecutar la aplicación con Uvicorn
 
-![DOCKER](.\img\docker.jpeg "DOCKER")
+![DOCKER](img/docker.jpeg "DOCKER")
 
 
 ### 7.2 Construcción de imagen
@@ -157,7 +157,7 @@ docker build -t api-banco-simulado .
 docker run -p 8080:8001 --env-file .env api-banco-simulado
 ```
 
-![API_DOCKER](.\img\bank_api_loc8001.jpeg "API_DOCKER")
+![API_DOCKER](img/bank_api_loc8001.jpeg "API_DOCKER")
 
 ### 7.4 Ejecución con Docker Compose (API + PostgreSQL)
 
@@ -169,7 +169,7 @@ Servicio disponible en:
 - API: `http://localhost:8080`
 - Base de datos: `localhost:5432`
 
-![API_DOCKER1](.\img\bank_api_local8080.jpeg "API_DOCKER1")
+![API_DOCKER1](img/bank_api_local8080.jpeg "API_DOCKER1")
 ---
 
 ## 🧪 8. PRUEBAS FUNCIONALES CON CURL
@@ -238,7 +238,7 @@ Requisitos recomendados para despliegue:
 ## 📦 10. EJECUCIÓN  CON DOCKER COMPOSE
 Para desplegar en local o servidor, se usa una imagen ya publicada en Docker Hub y se levanta todo con un único `docker compose up -d`.
 
-![DOCK_EEXE](.\img\docker_db.jpeg "DOCK_EXE")
+![DOCK_EEXE](img/docker_db.jpeg "DOCK_EXE")
 
 ### 10.1 Descargar imagen publicada
 
