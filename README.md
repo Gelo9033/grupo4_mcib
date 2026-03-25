@@ -141,7 +141,7 @@ Se creó un archivo Dockerfile que permite:
 - Exponer el puerto **interno** 8001 del contenedor
 - Ejecutar la aplicación con Uvicorn
 
-![DOCKER](img/docker.jpeg "DOCKER")
+![DOCKER_FILE](img/docker_file.png "DOCKER_FILE")
 
 
 ### 7.2 Construcción de imagen
@@ -179,7 +179,7 @@ Servicio disponible en:
 ```bash
 curl -X GET http://127.0.0.1:8080/
 ```
-
+![PRUEBA_CURL](img/curl_bienvenida.png "PRUEBA_CURL")
 ### 8.2 Login
 
 ```bash
@@ -187,14 +187,14 @@ curl -X POST http://127.0.0.1:8080/login \
 	-H "Content-Type: application/json" \
 	-d '{"username":"admin","password":"admin123"}'
 ```
-
+![PRUEBA_CURL](img/curl_login_parametros.jpg "PRUEBA_CURL")
 ### 8.3 Consultar saldo con token
 
 ```bash
 curl -G http://127.0.0.1:8080/saldo \
 	--data-urlencode "token=TOKEN_AQUI"
 ```
-
+![PRUEBA_CURL](img/cosulta_saldo_token.jpg "PRUEBA_CURL")
 ### 8.4 Transferir
 
 ```bash
@@ -202,7 +202,7 @@ curl -X POST "http://127.0.0.1:8080/transferir?token=TOKEN_AQUI" \
 	-H "Content-Type: application/json" \
 	-d '{"destino":"usuario2","monto":25.5}'
 ```
-
+![PRUEBA_CURL](img/transferencia_token_usuario2.jpg "PRUEBA_CURL")
 ### 8.5 Recargar
 
 ```bash
@@ -210,14 +210,14 @@ curl -X POST "http://127.0.0.1:8080/recargar?token=TOKEN_AQUI" \
 	-H "Content-Type: application/json" \
 	-d '{"monto":100}'
 ```
-
+![PRUEBA_CURL](img/recarga_token_usuario.png "PRUEBA_CURL")
 ### 8.6 Consultar movimientos
 
 ```bash
 curl -G http://127.0.0.1:8080/movimientos \
 	--data-urlencode "token=TOKEN_AQUI"
 ```
-
+![PRUEBA_CURL](img/movimientos_token_user.png "PRUEBA_CURL")
 ---
 
 ## ☁️ 9. DESPLIEGUE EN LA NUBE (OPCIONAL)
@@ -226,6 +226,9 @@ La API puede desplegarse en servicios cloud como:
 - Google Compute Engine
 - AWS ECS/Fargate
 - Azure Container Apps
+// No se realiza ningun despliegue mas que la carga de la imagen en DockerHub
+
+![DOCKER_HUB](img/docker_hub.jpeg "DOCKER_HUB")
 
 Requisitos recomendados para despliegue:
 - Variables de entorno seguras (`DB_*`, `ADMIN_API_KEY`, `TELEGRAM_*`)
@@ -238,7 +241,7 @@ Requisitos recomendados para despliegue:
 ## 📦 10. EJECUCIÓN  CON DOCKER COMPOSE
 Para desplegar en local o servidor, se usa una imagen ya publicada en Docker Hub y se levanta todo con un único `docker compose up -d`.
 
-![DOCK_EEXE](img/docker_db.jpeg "DOCK_EXE")
+![DOCK_EEXE](img/contenedor_docker_api_db.jpeg "DOCK_EXE")
 
 ### 10.1 Descargar imagen publicada
 
