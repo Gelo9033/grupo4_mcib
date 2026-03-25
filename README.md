@@ -43,8 +43,6 @@ El sistema está compuesto por los siguientes elementos:
 - **Repositorio GitHub**: Almacena el código fuente y el historial de versiones.
 - **Infraestructura Cloud**: Servicio de despliegue local/cloud (Cloud Run / Compute Engine, opcional).
 
-![RAMAS](img/ramas.jpeg "RAMAS")
-
 **Flujo general:**
 > Cliente → API (HTTP/JSON) → Lógica de negocio → PostgreSQL
 
@@ -68,7 +66,29 @@ El repositorio incluye:
 
 ![Estructura del repositorio](img/api_structure.jpeg "Estructura del repositorio")
 
-### 5.3 Funcionalidades implementadas
+### 5.3 Integraciones externas y persistencia de datos
+
+Este proyecto **utiliza servicios externos** además de la lógica propia del API:
+
+- **API externa de Telegram (Bot API):**
+  - Se usa para enviar alertas automáticas de seguridad y fraude.
+  - Casos principales: intentos fallidos de login y operaciones sospechosas (por ejemplo, saldo insuficiente en transferencias).
+  - Configuración requerida por variables de entorno:
+    - `TELEGRAM_BOT_TOKEN`
+    - `TELEGRAM_CHAT_ID`
+  - Si estas variables están vacías, la API principal sigue funcionando, pero las notificaciones de Telegram se desactivan.
+![API_TELEGRAM](img/api_telegram.jpeg "API_TELEGRAM")
+- **Base de datos PostgreSQL:**
+  - Se usa como almacenamiento persistente de la aplicación.
+  - Guarda información de usuarios, saldos y movimientos/transacciones.
+  - El API se conecta a PostgreSQL mediante variables de entorno:
+    - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+  - En ejecución local se levanta con Docker Compose como servicio `db` (`postgres:16-alpine`).
+
+**Resumen técnico de dependencias externas:**
+> Cliente → API FastAPI → PostgreSQL (persistencia) + Telegram Bot API (alertas)
+
+### 5.4 Funcionalidades implementadas
 - **Endpoint GET (Inicio/Status)**
 	- Permite consultar el estado del API y verificar que el servicio está en ejecución.
 	- Ruta: `/` (ejemplo público: `http://127.0.0.1:8080/`)
@@ -108,8 +128,6 @@ Se implementaron validaciones básicas como:
 **Manejo de respuestas**
 Todas las respuestas se devuelven en formato JSON estructurado.
 
-![API en Ejecución](img/api_funciona.jpeg "API en Ejecución")
-
 ---
 
 ## 🌿 6. CONTROL DE VERSIONES (GITHUB)
@@ -117,6 +135,8 @@ Se utilizó GitHub para:
 - Gestión del código fuente
 - Control de versiones
 - Trabajo con ramas (branches)
+
+![RAMAS](img/ramas.jpeg "RAMAS")
 
 **Uso de branches**
 Se recomienda implementar nuevas funcionalidades en ramas independientes, por ejemplo:
@@ -226,7 +246,7 @@ La API puede desplegarse en servicios cloud como:
 - Google Compute Engine
 - AWS ECS/Fargate
 - Azure Container Apps
-// No se realiza ningun despliegue mas que la carga de la imagen en DockerHub
+En este proyecto no se realizó despliegue activo en cloud; únicamente se publicó la imagen en Docker Hub como preparación para despliegue futuro.
 
 ![DOCKER_HUB](img/docker_hub.jpeg "DOCKER_HUB")
 
@@ -238,8 +258,8 @@ Requisitos recomendados para despliegue:
 
 ---
 
-## 📦 10. EJECUCIÓN  CON DOCKER COMPOSE
-Para desplegar en local o servidor, se usa una imagen ya publicada en Docker Hub y se levanta todo con un único `docker compose up -d`.
+## 📦 10. EJECUCIÓN CON DOCKER COMPOSE
+Para ejecutar este repositorio en local o servidor se usa Docker Compose con build local de la API y PostgreSQL como servicio de base de datos.
 
 ![DOCK_EEXE](img/contenedor_docker_api_db.jpeg "DOCK_EXE")
 
@@ -261,7 +281,7 @@ TELEGRAM_BOT_TOKEN=TU_TOKEN
 TELEGRAM_CHAT_ID=TU_CHAT_ID
 ```
 
-### 10.3 Crear archivo docker-compose.yml
+### 10.2 Crear archivo docker-compose.yml
 
 ```yaml
 version: "3.9"
@@ -308,17 +328,18 @@ volumes:
   postgres_data:
 ```
 
-### 10.4 Levantar contenedores
+### 10.3 Levantar contenedores
 
 ```bash
 docker compose --env-file .env up -d
 ```
 
-### 10.5 Aspectos críticos para evitar fallos (`git pull` y `docker pull`)
+### 10.4 Aspectos críticos para evitar fallos
 - Si haces `git pull`, revisa y actualiza tu archivo `.env` local antes de levantar servicios.
 - Si solo haces `docker pull` de la imagen, igual necesitas `.env` con `DB_*`, `ADMIN_API_KEY` y opcionalmente `TELEGRAM_*`.
 - Las credenciales deben permanecer fuera del repositorio: `.env` está ignorado en `.gitignore`.
 - Las credenciales tampoco se empaquetan en la imagen: `.env` está excluido por `.dockerignore`.
+- Define `ADMIN_API_KEY` en `.env` para entornos reales; el valor por defecto en Docker Compose debe usarse solo para pruebas locales.
 - `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` vacíos no rompen la API, pero desactivan alertas por Telegram.
 - Verifica puertos libres en el host: `8080` (API) y `5432` (PostgreSQL).
 
